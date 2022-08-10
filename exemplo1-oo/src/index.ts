@@ -36,8 +36,10 @@ console.log(`Área: ${circle1.calculateArea()}`)
 console.log(`Perímetro: ${circle1.calculatePerimeter()}`)
 console.log(`Raio: ${circle1.radius}`)
 
-const contact1 = new Contact('Sid', '9999-9999', 'sidney@email.com')
-console.log(contact1)
-contact1.name = 'Sid'
-contact1.phone = '99999-9999'
-console.log(contact1)
+const contact1 = new Contact()
+contact1.name = 'Sidney Sousa'
+contact1.email = 'sidney@email.com'
+contact1.phone = '(99) 99999-9999'
+console.log(`Nome: ${contact1.name}`)
+console.log(`E-mail: ${contact1.email}`)
+console.log(`Phone: ${contact1.phone}`)
