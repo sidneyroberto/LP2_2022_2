@@ -32,4 +32,8 @@ export default class Emprestimo {
 
     return 0
   }
+
+  simularValorPrestacao() {
+    return this.simularValorReal() / this._quantidadePrestacoes
+  }
 }
