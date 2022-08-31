@@ -32,3 +32,19 @@ describe('Testes de empréstimos para clientes do tipo Platinum', () => {
     expect(prestacao).toBe(0)
   })
 })
+
+describe('Testes de empréstimos para clientes do tipo Gold', () => {
+  test('Deve permitir um empréstimo dentro das condições favoráveis aos clientes do tipo Gold', () => {
+    const emprestimo = new Emprestimo(TipoCliente.GOLD, 180000, 48)
+    expect(emprestimo.simularValorReal()).toBe(283680)
+    const prestacao = emprestimo.simularValorPrestacao()
+    expect(prestacao).toBe(5910)
+  })
+
+  test('Não deve permitir um empréstimo fora das condições favoráveis aos clientes do tipo Gold', () => {
+    const emprestimo = new Emprestimo(TipoCliente.GOLD, 180000, 49)
+    expect(emprestimo.simularValorReal()).toBe(0)
+    const prestacao = emprestimo.simularValorPrestacao()
+    expect(prestacao).toBe(0)
+  })
+})

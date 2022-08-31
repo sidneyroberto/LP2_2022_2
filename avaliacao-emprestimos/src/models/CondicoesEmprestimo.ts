@@ -29,10 +29,6 @@ export default class CondicoesEmprestimo {
         this._quantidadeMaximaPrestacoes = 48
         this._taxaJuros = 1.2
         break
-      default:
-        this._limite = 0
-        this._quantidadeMaximaPrestacoes = 0
-        this._taxaJuros = 0
     }
   }
 

@@ -18,10 +18,11 @@ export default class Emprestimo {
 
   simularValorReal() {
     let condicoes = new CondicoesEmprestimo(this._tipoCliente)
-    //valorRealDoEmprestimo = valor * (1 + ( taxaDeJuros /100 * quantidadeParcelas))
+
     if (
       this._valor <= condicoes.limite &&
-      this._quantidadePrestacoes <= condicoes.quantidadeMaximaPrestacoes
+      this._quantidadePrestacoes <= condicoes.quantidadeMaximaPrestacoes &&
+      this._quantidadePrestacoes >= 1
     ) {
       let valorReal = condicoes.taxaJuros / 100
       valorReal *= this._quantidadePrestacoes
