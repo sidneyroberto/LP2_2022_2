@@ -159,3 +159,51 @@ describe('Tests over querying properties at CSV properties file', () => {
     )
   })
 })
+
+describe('Tests over new property insertion at CSV properties file', () => {
+  beforeEach(() => {
+    writeFileSync(csvPath, '')
+  })
+
+  test('It should contain the new property after add it to the properties file', () => {
+    const userProperty: UserProperty = {
+      key: 'email',
+      value: 'sid@email.com',
+    }
+
+    const userPropertyDAO = new UserPropertyDAO()
+    userPropertyDAO.setCsv(userProperty)
+
+    const content = readFileSync(csvPath, 'utf-8')
+    expect(content).toBe('email\nsid@email.com\n')
+  })
+
+  test('It should contain all the new properties after add them to the properties file', () => {
+    let userProperties: UserProperty[] = [
+      {
+        key: 'name',
+        value: 'Sidney',
+      },
+      {
+        key: 'email',
+        value: 'sid@email.com',
+      },
+      {
+        key: 'cpf',
+        value: '99999999999',
+      },
+      {
+        key: 'age',
+        value: 18,
+      },
+    ]
+
+    const userPropertyDAO = new UserPropertyDAO()
+    userProperties.forEach((up) => userPropertyDAO.setCsv(up))
+
+    const content = readFileSync(csvPath, 'utf-8')
+    const expectedContent =
+      'name,email,cpf,age\nSidney,sid@email.com,99999999999,18\n'
+    expect(content).toBe(expectedContent)
+  })
+})
