@@ -15,7 +15,7 @@ export default class UserPropertyDAO {
     )
   }
 
-  add(userProperty: UserProperty) {
+  set(userProperty: UserProperty) {
     const { key, value } = userProperty
     const newProperty = `${key}=${value}\n`
 
