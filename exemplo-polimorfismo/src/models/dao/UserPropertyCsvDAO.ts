@@ -3,18 +3,12 @@ import { join } from 'path'
 import UserProperty from '../entities/UserProperty'
 import IUserPropertyDAO from './IUserPropertyDAO'
 
-export default class UserPropertyDAO implements IUserPropertyDAO {
+export default class UserPropertyCsvDAO implements IUserPropertyDAO {
   private _userPropertyFilePath: string
   private _properties: UserProperty[]
 
   constructor() {
-    this._userPropertyFilePath = join(
-      __dirname,
-      '..',
-      '..',
-      'data',
-      'user.properties'
-    )
+    this._userPropertyFilePath = join(__dirname, '..', '..', 'data', 'user.csv')
 
     this._loadProperties()
   }
@@ -23,10 +17,10 @@ export default class UserPropertyDAO implements IUserPropertyDAO {
     this._properties = []
     const content = readFileSync(this._userPropertyFilePath, 'utf-8')
     const lines = content.split('\n')
-    lines.forEach((l) => {
+    lines.slice(1).forEach((l) => {
       // ["email", "sidney@email.com"]
-      if (l && l.includes('=')) {
-        const aux = l.split('=')
+      if (l && l.includes(',')) {
+        const aux = l.split(',')
         const property: UserProperty = {
           key: aux[0],
           value: aux[1],
@@ -39,10 +33,10 @@ export default class UserPropertyDAO implements IUserPropertyDAO {
 
   private _saveProperties() {
     // Reseta o arquivo
-    writeFileSync(this._userPropertyFilePath, '')
+    writeFileSync(this._userPropertyFilePath, 'key,value\n')
 
     this._properties.forEach((p) => {
-      const line = `${p.key}=${p.value}\n`
+      const line = `${p.key},${p.value}\n`
       appendFileSync(this._userPropertyFilePath, line)
     })
   }
