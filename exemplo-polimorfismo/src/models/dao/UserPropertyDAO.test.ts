@@ -1,6 +1,8 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import UserProperty from '../entities/UserProperty'
+import IUserPropertyDAO from './IUserPropertyDAO'
+import UserPropertyCsvDAO from './UserPropertyCsvDAO'
 import UserPropertyDAO from './UserPropertyDAO'
 
 const path = join(__dirname, '..', '..', 'data', 'user.properties')
@@ -9,22 +11,30 @@ const csvPath = join(__dirname, '..', '..', 'data', 'user.csv')
 describe('Tests over new property insertion', () => {
   beforeEach(() => {
     writeFileSync(path, '')
+    writeFileSync(csvPath, '')
   })
 
-  test('It should contain the new property after add it to the properties file', () => {
+  it('should contain the new property after add it to the properties file', () => {
     const userProperty: UserProperty = {
       key: 'email',
       value: 'sid@email.com',
     }
 
-    const userPropertyDAO = new UserPropertyDAO()
+    let userPropertyDAO: IUserPropertyDAO = new UserPropertyDAO()
     userPropertyDAO.set(userProperty)
 
-    const content = readFileSync(path, 'utf-8')
+    let content = readFileSync(path, 'utf-8')
     expect(content).toBe('email=sid@email.com\n')
+
+    userPropertyDAO = new UserPropertyCsvDAO()
+    userPropertyDAO.set(userProperty)
+
+    content = readFileSync(csvPath, 'utf-8')
+    const expectedValue = 'key,value\nemail,sid@email.com\n'
+    expect(content).toBe(expectedValue)
   })
 
-  test('It should contain all the new properties after add them to the properties file', () => {
+  it('should contain all the new properties after add them to the properties file', () => {
     let userProperties: UserProperty[] = [
       {
         key: 'name',
@@ -44,12 +54,19 @@ describe('Tests over new property insertion', () => {
       },
     ]
 
-    const userPropertyDAO = new UserPropertyDAO()
+    let userPropertyDAO: IUserPropertyDAO = new UserPropertyDAO()
     userProperties.forEach((up) => userPropertyDAO.set(up))
 
-    const content = readFileSync(path, 'utf-8')
-    const expectedContent =
+    let content = readFileSync(path, 'utf-8')
+    let expectedContent =
       'name=Sidney\nemail=sid@email.com\ncpf=99999999999\nage=18\n'
+    expect(content).toBe(expectedContent)
+
+    userPropertyDAO = new UserPropertyCsvDAO()
+    userProperties.forEach((up) => userPropertyDAO.set(up))
+    content = readFileSync(csvPath, 'utf-8')
+    expectedContent =
+      'key,value\nname,Sidney\nemail,sid@email.com\ncpf,99999999999\nage,18\n'
     expect(content).toBe(expectedContent)
   })
 })
@@ -57,156 +74,66 @@ describe('Tests over new property insertion', () => {
 describe('Tests over querying properties', () => {
   beforeEach(() => {
     writeFileSync(path, '')
-  })
-
-  test('It should return null when key is not found', () => {
-    const userPropertyDAO = new UserPropertyDAO()
-    expect(userPropertyDAO.get('name')).toBe(null)
-  })
-
-  test('It should return correct value when key is found', () => {
-    const userPropertyDAO = new UserPropertyDAO()
-    const userProperty: UserProperty = {
-      key: 'name',
-      value: 'Sidney Sousa',
-    }
-    userPropertyDAO.set(userProperty)
-
-    expect(userPropertyDAO.get('name')).toBe('Sidney Sousa')
-  })
-
-  test('It should return correct value after a sequence of updates over a property', () => {
-    const userPropertyDAO = new UserPropertyDAO()
-
-    let userProperty: UserProperty = {
-      key: 'email',
-      value: 'sidney@email.com',
-    }
-    userPropertyDAO.set(userProperty)
-
-    userProperty = {
-      key: 'email',
-      value: 'sidney.sousa@email.com',
-    }
-    userPropertyDAO.set(userProperty)
-
-    userProperty = {
-      key: 'email',
-      value: 'sidney.sousa@email.com',
-    }
-    userPropertyDAO.set(userProperty)
-
-    userProperty = {
-      key: 'email',
-      value: 'sidney.sousa@brazilianmail.com',
-    }
-    userPropertyDAO.set(userProperty)
-
-    expect(userPropertyDAO.get('email')).toBe('sidney.sousa@brazilianmail.com')
-  })
-})
-
-/*
-describe('Tests over querying properties at CSV properties file', () => {
-  beforeEach(() => {
     writeFileSync(csvPath, '')
   })
 
-  test('It should return null when key is not found', () => {
-    const userPropertyDAO = new UserPropertyDAO()
-    expect(userPropertyDAO.getCsv('name')).toBe(null)
+  it('should return null when key is not found', () => {
+    let userPropertyDAO: IUserPropertyDAO = new UserPropertyDAO()
+    expect(userPropertyDAO.get('name')).toBe(null)
+    userPropertyDAO = new UserPropertyCsvDAO()
+    expect(userPropertyDAO.get('name')).toBe(null)
   })
 
-  test('It should return correct value when key is found', () => {
-    const userPropertyDAO = new UserPropertyDAO()
+  it('should return correct value when key is found', () => {
+    let userPropertyDAO: IUserPropertyDAO = new UserPropertyDAO()
     const userProperty: UserProperty = {
       key: 'name',
       value: 'Sidney Sousa',
     }
-    userPropertyDAO.setCsv(userProperty)
 
-    expect(userPropertyDAO.getCsv('name')).toBe('Sidney Sousa')
+    userPropertyDAO.set(userProperty)
+    expect(userPropertyDAO.get('name')).toBe('Sidney Sousa')
+
+    userPropertyDAO = new UserPropertyCsvDAO()
+    userPropertyDAO.set(userProperty)
+    expect(userPropertyDAO.get('name')).toBe('Sidney Sousa')
   })
 
-  test('It should return correct value after a sequence of updates over a property', () => {
+  it('should return correct value after a sequence of updates over a property', () => {
     const userPropertyDAO = new UserPropertyDAO()
+    const userPropertyCsvDAO = new UserPropertyCsvDAO()
 
     let userProperty: UserProperty = {
       key: 'email',
       value: 'sidney@email.com',
     }
-    userPropertyDAO.setCsv(userProperty)
+    userPropertyDAO.set(userProperty)
+    userPropertyCsvDAO.set(userProperty)
 
     userProperty = {
       key: 'email',
       value: 'sidney.sousa@email.com',
     }
-    userPropertyDAO.setCsv(userProperty)
+    userPropertyDAO.set(userProperty)
+    userPropertyCsvDAO.set(userProperty)
 
     userProperty = {
       key: 'email',
-      value: 'sidney.sousa@email.com',
+      value: 'sidney.sousa2@email.com',
     }
-    userPropertyDAO.setCsv(userProperty)
+    userPropertyDAO.set(userProperty)
+    userPropertyCsvDAO.set(userProperty)
 
     userProperty = {
       key: 'email',
       value: 'sidney.sousa@brazilianmail.com',
     }
-    userPropertyDAO.setCsv(userProperty)
+    userPropertyDAO.set(userProperty)
+    userPropertyCsvDAO.set(userProperty)
 
-    expect(userPropertyDAO.getCsv('email')).toBe(
+    expect(userPropertyDAO.get('email')).toBe('sidney.sousa@brazilianmail.com')
+    expect(userPropertyCsvDAO.get('email')).toBe(
       'sidney.sousa@brazilianmail.com'
     )
   })
 })
-
-describe('Tests over new property insertion at CSV properties file', () => {
-  beforeEach(() => {
-    writeFileSync(csvPath, '')
-  })
-
-  test('It should contain the new property after add it to the properties file', () => {
-    const userProperty: UserProperty = {
-      key: 'email',
-      value: 'sid@email.com',
-    }
-
-    const userPropertyDAO = new UserPropertyDAO()
-    userPropertyDAO.setCsv(userProperty)
-
-    const content = readFileSync(csvPath, 'utf-8')
-    expect(content).toBe('email\nsid@email.com\n')
-  })
-
-  test('It should contain all the new properties after add them to the properties file', () => {
-    let userProperties: UserProperty[] = [
-      {
-        key: 'name',
-        value: 'Sidney',
-      },
-      {
-        key: 'email',
-        value: 'sid@email.com',
-      },
-      {
-        key: 'cpf',
-        value: '99999999999',
-      },
-      {
-        key: 'age',
-        value: 18,
-      },
-    ]
-
-    const userPropertyDAO = new UserPropertyDAO()
-    userProperties.forEach((up) => userPropertyDAO.setCsv(up))
-
-    const content = readFileSync(csvPath, 'utf-8')
-    const expectedContent =
-      'name,email,cpf,age\nSidney,sid@email.com,99999999999,18\n'
-    expect(content).toBe(expectedContent)
-  })
-})
-
-*/
