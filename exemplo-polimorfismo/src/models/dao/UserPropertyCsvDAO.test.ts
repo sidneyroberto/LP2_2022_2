@@ -49,3 +49,57 @@ describe('Tests over new property insertion', () => {
     expect(content).toBe(expectedContent)
   })
 })
+
+describe('Tests over property querying', () => {
+  beforeEach(() => writeFileSync(path, ''))
+
+  it('should retrieve a previously inserted property', () => {
+    const userProperty: UserProperty = {
+      key: 'name',
+      value: 'Tatiane',
+    }
+
+    const userPropertyDAO = new UserPropertyCsvDAO()
+    userPropertyDAO.set(userProperty)
+
+    const value = userPropertyDAO.get('name')
+    expect(value).toBe(userProperty.value)
+  })
+
+  it('should correctly update a property value', () => {
+    const userProperty: UserProperty = {
+      key: 'name',
+      value: 'Tatiane',
+    }
+
+    const userPropertyDAO = new UserPropertyCsvDAO()
+    userPropertyDAO.set(userProperty)
+
+    userProperty.value = 'Clara'
+    userPropertyDAO.set(userProperty)
+    userProperty.value = 'Patrícia'
+    userPropertyDAO.set(userProperty)
+
+    const value = userPropertyDAO.get('name')
+    expect(value).toBe(userProperty.value)
+  })
+
+  it('should correctly load properties file content', () => {
+    const content = 'key,value\nname,Tatiane\nemail,tati@email.com\nid,37\n'
+    writeFileSync(path, content)
+
+    const userPropertyDAO = new UserPropertyCsvDAO()
+    let value = userPropertyDAO.get('name')
+    expect(value).toBe('Tatiane')
+    value = userPropertyDAO.get('email')
+    expect(value).toBe('tati@email.com')
+    value = userPropertyDAO.get('id')
+    expect(value).toBe('37')
+  })
+
+  it('should return null when property does not exist', () => {
+    const userPropertyDAO = new UserPropertyCsvDAO()
+    const value = userPropertyDAO.get('name')
+    expect(value).toBe(null)
+  })
+})
