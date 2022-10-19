@@ -1,6 +1,6 @@
 import Polygon from './Polygon'
 
-export default class Square extends Polygon {
+export default class EquilateralTriangle extends Polygon {
   size: number
 
   constructor(size: number) {
@@ -9,10 +9,10 @@ export default class Square extends Polygon {
   }
 
   area(): number {
-    return this.size * this.size
+    return (Math.pow(this.size, 2) * Math.sqrt(3)) / 4
   }
 
   perimeter(): number {
-    return this.size * 4
+    return this.size * 3
   }
 }

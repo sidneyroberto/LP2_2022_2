@@ -1,10 +1,20 @@
-import MyGenericClass from './models/MyGenericClass'
+import Square from './models/Square'
+import EquilateralTriangle from './models/EquilateralTriangle'
+import Polygon from './models/Polygon'
 
-const obj1 = new MyGenericClass<string>('Fala, negada!')
-obj1.sayMessage()
+const sqr = new Square(12)
+console.log('Área: ', sqr.area())
+console.log('Perímetro: ', sqr.perimeter())
 
-const obj2 = new MyGenericClass<number>(42)
-obj2.sayMessage()
+const tri = new EquilateralTriangle(12)
+console.log('Área: ', tri.area())
+console.log('Perímetro: ', tri.perimeter())
 
-const obj3 = new MyGenericClass<Date>(new Date())
-obj3.sayMessage()
+const sqr2 = new Square(5)
+const tri2 = new EquilateralTriangle(5)
+
+console.log('Soma das áreas: ', Polygon.sumAreas(sqr, tri, sqr2, tri2))
+console.log(
+  'Soma dos perímetros: ',
+  Polygon.sumPerimeters(sqr, tri, sqr2, tri2)
+)
