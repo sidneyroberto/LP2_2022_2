@@ -25,6 +25,20 @@ export class GenericDAO<T extends Entity> {
     return result.rowCount == 1 ? Object.assign(instance, result.rows[0]) : null
   }
 
+  async findAll(): Promise<T[]> {
+    const sqlQuery = `select *from "${this._tableName}" order by id`
+    const result = await executeQuery(sqlQuery)
+
+    const { rows } = result
+    const objs: T[] = rows.map((r) => {
+      const instance = new this._entity()
+      Object.assign(instance, r)
+      return instance
+    })
+
+    return objs
+  }
+
   private _getAttributes(obj: T): string[] {
     return Object.getOwnPropertyNames(obj)
   }
