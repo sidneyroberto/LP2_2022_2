@@ -12,42 +12,45 @@ const sqlPool = new Pool({
   password: process.env.PASSWORD,
 })
 
-export const createTables = () => {
-  console.log('Creating tables...')
-  sqlPool.query(
-    `
+export const createTables = async () => {
+  const client = await sqlPool.connect()
+
+  try {
+    await client.query('BEGIN')
+
+    // Faz tudo que tem que ser feito
+    await client.query(`
         create table if not exists "user" (
-            "id" serial primary key,
-            "name" varchar not null,
-            "email" varchar not null
-        )
-    `,
-    (err, _) => {
-      if (err) {
-        console.log('Error while trying to create table user')
-        console.log(err)
-      }
-    }
-  )
+          "id" serial primary key,
+          "name" varchar not null,
+          "email" varchar not null
+      )
+    `)
 
-  sqlPool.query(
-    `
+    await client.query(`
         create table if not exists "post" (
-            "id" serial primary key,
-            "title" varchar not null,
-            "content" varchar not null,
-            "creationDate" date not null
-        )
-    `,
-    (err, _) => {
-      if (err) {
-        console.log('Error while trying to create table post')
-        console.log(err)
-      }
-    }
-  )
+          "id" serial primary key,
+          "title" varchar not null,
+          "content" varchar not null,
+          "creationDate" date not null
+      )      
+    `)
 
-  console.log('Process finished')
+    await client.query('COMMIT')
+  } catch (err) {
+    await client.query('ROLLBACK')
+  }
+
+  console.log('Feito')
+  client.release()
+}
+
+export const executeQuery = async (query: string, values?: any[]) => {
+  const result = values
+    ? await sqlPool.query(query, values)
+    : await sqlPool.query(query)
+
+  return result
 }
 
 process.on('SIGINT', async () => {

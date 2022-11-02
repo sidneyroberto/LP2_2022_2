@@ -1,7 +1,6 @@
 import { Entity } from './Entity'
 
 export class User extends Entity {
-  id?: number
   name: string
   email: string
 

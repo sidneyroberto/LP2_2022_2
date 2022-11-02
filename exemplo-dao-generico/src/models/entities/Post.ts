@@ -1,7 +1,6 @@
 import { Entity } from './Entity'
 
 export class Post extends Entity {
-  id?: number
   title: string
   content: string
   creationDate: Date
